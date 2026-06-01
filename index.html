@@ -1,0 +1,90 @@
+python -c "with open('templates/index.html', 'w', encoding='utf-8') as f: f.write('''<!DOCTYPE html>
+<html>
+<head>
+    <title>Synapse</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        #chat-box { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .message { margin: 5px 0; }
+        .user { color: blue; }
+        .assistant { color: green; }
+        #login-form, #main-area { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Synapse</h1>
+
+    <div id="login-form">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="login-error" style="color:red"></p>
+    </div>
+
+    <div id="main-area">
+        <button onclick="logout()">Logout</button>
+        <h2>Upload Document</h2>
+        <input type="file" id="file-input">
+        <button onclick="upload()">Upload</button>
+        <p id="upload-status"></p>
+
+        <h2>Chat with your documents</h2>
+        <div id="chat-box"></div>
+        <input type="text" id="question" placeholder="Ask a question" style="width:80%">
+        <button onclick="ask()">Send</button>
+    </div>
+
+    <script>
+        async function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const form = new FormData();
+            form.append("email", email);
+            form.append("password", password);
+            const resp = await fetch("/login", {method: "POST", body: form});
+            if (resp.ok) {
+                document.getElementById("login-form").style.display = "none";
+                document.getElementById("main-area").style.display = "block";
+            } else {
+                document.getElementById("login-error").textContent = "Invalid credentials";
+            }
+        }
+
+        async function logout() {
+            await fetch("/logout");
+            document.getElementById("login-form").style.display = "block";
+            document.getElementById("main-area").style.display = "none";
+        }
+
+        async function upload() {
+            const fileInput = document.getElementById("file-input");
+            const file = fileInput.files[0];
+            if (!file) return alert("Select a file");
+            const form = new FormData();
+            form.append("file", file);
+            const resp = await fetch("/upload", {method: "POST", body: form});
+            const data = await resp.json();
+            document.getElementById("upload-status").textContent = `Indexed ${data.chunks_indexed} chunks.`;
+        }
+
+        async function ask() {
+            const question = document.getElementById("question").value;
+            if (!question) return;
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="message user"><b>You:</b> ${question}</div>`;
+            document.getElementById("question").value = "";
+
+            const form = new FormData();
+            form.append("question", question);
+            const resp = await fetch("/ask", {method: "POST", body: form});
+            const data = await resp.json();
+            chatBox.innerHTML += `<div class="message assistant"><b>Synapse:</b> ${data.answer}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Show login by default
+        document.getElementById("login-form").style.display = "block";
+    </script>
+</body>
+</html>''')"

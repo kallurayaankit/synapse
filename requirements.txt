@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+qdrant-client
+sentence-transformers
+PyPDF2
+langchain-text-splitters
+jinja2
+requests

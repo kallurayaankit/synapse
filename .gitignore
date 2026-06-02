@@ -1,3 +1,7 @@
 venv/ 
 __pycache__/ 
+*.pyc 
 uploads/ 
+qdrant_storage/ 
+synapse.db 
+.env 

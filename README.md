@@ -1,3 +1,4 @@
+https://kallurayaankit-synapse.hf.space
 # 🧠 Synapse – Personal AI Command Center
 
 [![CI](https://github.com/kallurayaankit/synapse/actions/workflows/ci.yml/badge.svg)](https://github.com/kallurayaankit/synapse/actions/workflows/ci.yml)
